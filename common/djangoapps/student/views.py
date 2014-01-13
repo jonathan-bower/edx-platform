@@ -45,7 +45,7 @@ from student.models import (
 )
 from student.forms import PasswordResetFormNoActive
 
-from verify_student.models import SoftwareSecurePhotoVerification
+from verify_student.models import SoftwareSecurePhotoVerification, MidcourseReverificationWindow
 from certificates.models import CertificateStatuses, certificate_status_for_student
 
 from xmodule.course_module import CourseDescriptor
@@ -350,6 +350,16 @@ def dashboard(request):
     # Verification Attempts
     verification_status, verification_msg = SoftwareSecurePhotoVerification.user_status(user)
 
+    # Todo make this fall a function
+    prompt_midcourse_reverify = False
+    reverify_courses = []
+    reverify_dates = []
+    for (course, enrollment) in course_enrollment_pairs:
+        if MidcourseReverificationWindow.window_open_for_course(course.id):
+            reverify_courses = course.display_name
+            reverify_dates = MidcourseReverificationWindow.get_window(course.id).end_date
+            prompt_midcourse_reverify = True
+
     show_refund_option_for = frozenset(course.id for course, _enrollment in course_enrollment_pairs
                                        if _enrollment.refundable())
 
@@ -370,6 +380,9 @@ def dashboard(request):
                'all_course_modes': course_modes,
                'cert_statuses': cert_statuses,
                'show_email_settings_for': show_email_settings_for,
+               'prompt_midcourse_reverify': prompt_midcourse_reverify,
+               'reverify_courses': reverify_courses,
+               'reverify_dates': reverify_dates,
                'verification_status': verification_status,
                'verification_msg': verification_msg,
                'show_refund_option_for': show_refund_option_for,

@@ -23,6 +23,7 @@ import pytz
 import requests
 
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.contrib.auth.models import User
@@ -36,6 +37,44 @@ from verify_student.ssencrypt import (
 )
 
 log = logging.getLogger(__name__)
+
+# eww
+def generateUUID():
+        return str(uuid.uuid4)
+
+class MidcourseReverificationWindow(models.Model):
+    """
+    Defines the start and end times for midcourse reverification for a particular course.
+    """
+    # the course that this window is attached to
+    course_id = models.CharField(max_length=255, db_index=True)
+
+    start_date = models.DateTimeField(default=None, null=True, blank=True)
+
+    end_date = models.DateTimeField(default=None, null=True, blank=True)
+
+    @classmethod
+    def window_open_for_course(cls, course_id):
+        """
+        Returns a boolean, True if the course is currently asking for reverification, else False.
+        """
+        now = datetime.now(pytz.UTC)
+
+        # We are assuming one window per course_id.  TODO find out if this assumption is OK
+        try:
+            window = cls.objects.get(course_id=course_id)
+        except(ObjectDoesNotExist):
+            return False
+
+        if (window.start_date <= now <= window.end_date):
+            return True
+        else:
+            return False
+
+    @classmethod
+    def get_window(cls, course_id):
+        """ TODO documentation """
+        return cls.objects.get(course_id=course_id)
 
 
 class VerificationException(Exception):
@@ -135,7 +174,8 @@ class PhotoVerification(StatusModel):
     # user IDs or something too easily guessable.
     receipt_id = models.CharField(
         db_index=True,
-        default=uuid.uuid4,
+        # using awk uuid workaround for now, see http://stackoverflow.com/questions/15041265/south-migrate-error-name-uuid-is-not-defined
+        default=generateUUID,
         max_length=255,
     )
 
@@ -166,6 +206,8 @@ class PhotoVerification(StatusModel):
     # goes on. We don't try to define an exhuastive list -- this is just
     # capturing it so that we can later query for the common problems.
     error_code = models.CharField(blank=True, max_length=50)
+
+    
 
     class Meta:
         abstract = True
@@ -461,6 +503,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
     # encode that. The result is saved here. Actual expected length is 344.
     photo_id_key = models.TextField(max_length=1024)
 
+    # Do we even want this?
     IMAGE_LINK_DURATION = 5 * 60 * 60 * 24  # 5 days in seconds
 
     @status_before_must_be("created")
@@ -483,7 +526,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         aes_key_str = settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["FACE_IMAGE_AES_KEY"]
         aes_key = aes_key_str.decode("hex")
 
-        s3_key = self._generate_key("face")
+        s3_key = self._generate_s3_key("face")
         s3_key.set_contents_from_string(encrypt_and_encode(img_data, aes_key))
 
     @status_before_must_be("created")
@@ -510,7 +553,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         rsa_encrypted_aes_key = rsa_encrypt(aes_key, rsa_key_str)
 
         # Upload this to S3
-        s3_key = self._generate_key("photo_id")
+        s3_key = self._generate_s3_key("photo_id")
         s3_key.set_contents_from_string(encrypt_and_encode(img_data, aes_key))
 
         # Update our record fields
@@ -580,11 +623,13 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         We dynamically generate this, since we want it the expiration clock to
         start when the message is created, not when the record is created.
         """
-        s3_key = self._generate_key(name)
+        s3_key = self._generate_s3_key(name)
         return s3_key.generate_url(self.IMAGE_LINK_DURATION)
 
-    def _generate_key(self, prefix):
+    def _generate_s3_key(self, prefix):
         """
+        Generates a key for an s3 bucket location
+
         Example: face/4dd1add9-6719-42f7-bea0-115c008c4fca
         """
         conn = S3Connection(
@@ -689,3 +734,64 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         log.debug("Return message:\n\n{}\n\n".format(response.text))
 
         return response
+
+# lol model validation
+class SoftwareSecurePhotoMidcourseReverification(SoftwareSecurePhotoVerification):
+    """ it's possible i should subclass this from software secure, idk let's see """
+
+    # TODO is this necesary
+    #course_id = "foobar"
+
+    def original_verification(self):
+        return (SoftwareSecurePhotoVerification.objects.get(user=self.user))
+
+    # could just call original_verification's _generate_s3_key?
+    def _generate_original_s3_key(self, prefix):
+        """
+        Generates a key into the S3 bucket where the original verification is stored
+
+        Example: face/4dd1add9-6719-42f7-bea0-115c008c4fca
+        """
+        conn = S3Connection(
+            settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["AWS_ACCESS_KEY"],
+            settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["AWS_SECRET_KEY"]
+        )
+        bucket = conn.get_bucket(settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["S3_BUCKET"])
+
+        key = Key(bucket)
+        key.key = "{}/{}".format(prefix, self.original_verification().receipt_id)
+
+        return key
+
+    @status_before_must_be("created")
+    def fetch_photo_id_image(self):
+        """
+        Find the user's photo ID image, which was submitted with their original verification.
+        The image has already been encrypted and stored in s3, so we just need to find that
+        location
+        """
+
+        if settings.FEATURES.get('AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'):
+            return
+
+        old_s3_key = self._generate_original_s3_key("face")
+        new_s3_key = self._generate_s3_key("face")
+
+        original_photo_id = old_s3_key.get_contents_as_string()
+
+        # Unlike upload_face_image, we don't need to encrypt and encode with AES, since that
+        # was already done when we uploaded it for the initial verification
+        new_s3_key.set_contents_from_string(original_photo_id)
+        self.photo_id_key = self.original_verification().photo_id_key
+        self.save()
+
+    # we replace_photo_id_image with fetch_photo_id_image
+    @status_before_must_be("created")
+    def upload_photo_id_image(self, img_data):
+        raise NotImplementedError
+
+    # submit inherits
+
+    # create_request inherits
+
+    # send_request inherits
