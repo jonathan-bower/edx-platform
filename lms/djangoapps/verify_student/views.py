@@ -345,7 +345,7 @@ class MidCourseReverifyView(View):
         context = {
             "user_full_name": request.user.profile.name,
             "error": False,
-            "course_id": "TODO"
+            "course_id": course_id,
         }
         return render_to_response("verify_student/midcourse_photo_reverification.html", context)
 
@@ -367,6 +367,7 @@ class MidCourseReverifyView(View):
             attempt.upload_face_image(b64_face_image.decode('base64'))
             attempt.fetch_photo_id_image()
             #TODO think about how we'll mark attempts
+            # crying when I save because the database is funky, TODO fix
             attempt.mark_ready()
 
             attempt.save()
