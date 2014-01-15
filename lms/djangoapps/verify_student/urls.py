@@ -42,7 +42,7 @@ urlpatterns = patterns(
     ),
 
     url(
-        r'^midcourse_reverify$',
+        r'^midcourse_reverify/(?P<course_id>[^/]+/[^/]+/[^/]+)$',
         views.MidCourseReverifyView.as_view(),
         name="verify_student_midcourse_reverify"
     ),

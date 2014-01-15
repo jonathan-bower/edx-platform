@@ -5,6 +5,8 @@ Views for the verification flow
 import json
 import logging
 import decimal
+import datetime
+from pytz import UTC
 
 from edxmako.shortcuts import render_to_response
 
@@ -336,18 +338,19 @@ class MidCourseReverifyView(View):
     Does not need to worry about pricing
     """
     @method_decorator(login_required)
-    def get(self, request):
+    def get(self, request, course_id):
         """
         display this view
         """
         context = {
             "user_full_name": request.user.profile.name,
             "error": False,
+            "course_id": "TODO"
         }
         return render_to_response("verify_student/midcourse_photo_reverification.html", context)
 
     @method_decorator(login_required)
-    def post(self, request):
+    def post(self, request, course_id):
         """
         submits the reverification to SoftwareSecure
         """
@@ -356,7 +359,9 @@ class MidCourseReverifyView(View):
 
         try:
             # TODO make sure we don't need something more specialized, i.e. a subclass on SSPV
-            attempt = SoftwareSecurePhotoMidcourseReverification(user=request.user)
+
+            now = datetime.datetime.now(UTC)
+            attempt = SoftwareSecurePhotoMidcourseReverification(user=request.user, window=MidcourseReverificationWindow.get_window(course_id, now))
             b64_face_image = request.POST['face_image'].split(",")[1]
 
             attempt.upload_face_image(b64_face_image.decode('base64'))
@@ -391,8 +396,9 @@ def midcourse_reverify_dash(_request):
         if MidcourseReverificationWindow.window_open_for_course(course.id):
             reverify_course_data.append(
                 (
+                    course.id,
                     course.display_name,
-                    MidcourseReverificationWindow.get_window(course.id).end_date,
+                    MidcourseReverificationWindow.get_window(course.id, datetime.datetime.now(UTC)).end_date,
                     "must_reverify"
                 )
             )

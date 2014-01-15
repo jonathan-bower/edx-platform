@@ -4,9 +4,9 @@
 <!--TODO replace this with a shiny loopy thing to actually print out all courses-->
 % if prompt_midcourse_reverify:
 <h2>${_("You need to re-verify to continue")}</h2>
-% for course, date, status in reverify_course_data:
+% for course_id, course_name, date, status in reverify_course_data:
 <p class='activation-message'>
-	${_('To continue in the verified track in {course}, you need to re-verify your identity by {date}.').format(course=reverify_course_data[0][0], date=reverify_course_data[0][1])}
+	${_('To continue in the verified track in {course_name}, you need to re-verify your identity by {date}.').format(course_name=course_name, date=date)}
 	<a href="${reverse('verify_student_midcourse_reverify_dash')}">Click here to re-verify.</a>
 </p>
 % endfor

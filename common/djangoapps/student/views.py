@@ -10,6 +10,8 @@ import string       # pylint: disable=W0402
 import urllib
 import uuid
 import time
+import datetime
+from pytz import UTC
 
 from django.conf import settings
 from django.contrib.auth import logout, authenticate, login
@@ -357,8 +359,9 @@ def dashboard(request):
         if MidcourseReverificationWindow.window_open_for_course(course.id):
             reverify_course_data.append(
                 (
+                    course.id,
                     course.display_name,
-                    MidcourseReverificationWindow.get_window(course.id).end_date,
+                    MidcourseReverificationWindow.get_window(course.id, datetime.datetime.now(UTC)).end_date,
                     "must_reverify"
                 )
             )

@@ -4,10 +4,10 @@
 
 <p>You currently need to re-verify for the following course:</p>
 
-% for course, date, status in reverify_course_data:
-	<p>${course}: Re-verify by ${date}. 
+% for course_id, course_name, date, status in reverify_course_data:
+	<p>${course_name}: Re-verify by ${date}. 
 		% if status == "must_reverify":
-		  <a href="${reverse('verify_student_midcourse_reverify')}">Re-verify</a>
+		  <a href="${reverse('verify_student_midcourse_reverify', kwargs={'course_id': course_id})}">Re-verify</a>
 		% elif status == "completed":
 		  Completed
 		% elif status == "failed":

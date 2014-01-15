@@ -47,6 +47,7 @@ class MidcourseReverificationWindow(models.Model):
     Defines the start and end times for midcourse reverification for a particular course.
     """
     # the course that this window is attached to
+    # TODO should this be a foreignkey?
     course_id = models.CharField(max_length=255, db_index=True)
 
     start_date = models.DateTimeField(default=None, null=True, blank=True)
@@ -72,9 +73,9 @@ class MidcourseReverificationWindow(models.Model):
             return False
 
     @classmethod
-    def get_window(cls, course_id):
+    def get_window(cls, course_id, date):
         """ TODO documentation """
-        return cls.objects.get(course_id=course_id)
+        return cls.objects.get(course_id=course_id, start_date__lte=date, end_date__gte=date)
 
 
 class VerificationException(Exception):
@@ -741,6 +742,7 @@ class SoftwareSecurePhotoMidcourseReverification(SoftwareSecurePhotoVerification
 
     # TODO is this necesary
     #course_id = "foobar"
+    window = models.ForeignKey(MidcourseReverificationWindow, db_index=True)
 
     def original_verification(self):
         return (SoftwareSecurePhotoVerification.objects.get(user=self.user))
