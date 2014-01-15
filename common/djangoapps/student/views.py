@@ -350,14 +350,18 @@ def dashboard(request):
     # Verification Attempts
     verification_status, verification_msg = SoftwareSecurePhotoVerification.user_status(user)
 
-    # Todo make this fall a function
+    # Todo make this all a function
     prompt_midcourse_reverify = False
-    reverify_courses = []
-    reverify_dates = []
+    reverify_course_data = []
     for (course, enrollment) in course_enrollment_pairs:
         if MidcourseReverificationWindow.window_open_for_course(course.id):
-            reverify_courses = course.display_name
-            reverify_dates = MidcourseReverificationWindow.get_window(course.id).end_date
+            reverify_course_data.append(
+                (
+                    course.display_name,
+                    MidcourseReverificationWindow.get_window(course.id).end_date,
+                    "must_reverify"
+                )
+            )
             prompt_midcourse_reverify = True
 
     show_refund_option_for = frozenset(course.id for course, _enrollment in course_enrollment_pairs
@@ -381,8 +385,7 @@ def dashboard(request):
                'cert_statuses': cert_statuses,
                'show_email_settings_for': show_email_settings_for,
                'prompt_midcourse_reverify': prompt_midcourse_reverify,
-               'reverify_courses': reverify_courses,
-               'reverify_dates': reverify_dates,
+               'reverify_course_data': reverify_course_data,
                'verification_status': verification_status,
                'verification_msg': verification_msg,
                'show_refund_option_for': show_refund_option_for,

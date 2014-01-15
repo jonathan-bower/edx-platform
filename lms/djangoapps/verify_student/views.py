@@ -386,17 +386,20 @@ def midcourse_reverify_dash(_request):
         except ItemNotFoundError:
             log.error("User {0} enrolled in non-existent course {1}"
                       .format(user.username, enrollment.course_id))
-    reverify_courses = []
-    reverify_dates = []
+    reverify_course_data = []
     for (course, enrollment) in course_enrollment_pairs:
         if MidcourseReverificationWindow.window_open_for_course(course.id):
-            reverify_courses.append(course.display_name)
-            reverify_dates.append(MidcourseReverificationWindow.get_window(course.id).end_date)
+            reverify_course_data.append(
+                (
+                    course.display_name,
+                    MidcourseReverificationWindow.get_window(course.id).end_date,
+                    "must_reverify"
+                )
+            )
             prompt_midcourse_reverify = True
     context = {
         "user_full_name": _request.user.profile.name,
-        "reverify_courses": reverify_courses,
-        "reverify_dates": reverify_dates,
+        "reverify_course_data": reverify_course_data,
     }
     return render_to_response("verify_student/midcourse_reverify_dash.html", context)
 

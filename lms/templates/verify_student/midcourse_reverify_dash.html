@@ -4,8 +4,16 @@
 
 <p>You currently need to re-verify for the following course:</p>
 
-% for course in reverify_courses:
-	<p>${course}: <a href="${reverse('verify_student_midcourse_reverify')}">Reverify</a></p>
+% for course, date, status in reverify_course_data:
+	<p>${course}: Re-verify by ${date}. 
+		% if status == "must_reverify":
+		  <a href="${reverse('verify_student_midcourse_reverify')}">Re-verify</a>
+		% elif status == "completed":
+		  Completed
+		% elif status == "failed":
+		  Failed
+		% endif
+	</p>
 % endfor
 
 <h2>Why do I need to re-verify?</h2>
