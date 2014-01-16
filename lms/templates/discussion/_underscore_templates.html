@@ -32,7 +32,7 @@
       <div class="group-visibility-label">${"<%- obj.group_string%>"}</div>
               ${"<% }  %>"}
 
-          <a href="#" class="vote-btn" data-tooltip="${_('vote')}" role="button" aria-pressed="false"><!-- DiscussionContentView.renderVote populates this --></a>
+          <a href="#" class="vote-btn" role="button" aria-pressed="false"><!-- DiscussionContentView.renderVote populates this --></a>
           <h1>${'<%- title %>'}</h1>
           <p class="posted-details">
               ${"<% if (obj.username) { %>"}
@@ -67,12 +67,13 @@
       ${"<% }  %>"}
       % endif
 
-
-      ${'<% if (obj.courseware_url) { %>'}
-      <div class="post-context">${"""<%
+      <%  js_block = u"""
           var courseware_link = interpolate('<a href="%s">%s</a>', [courseware_url, _.escape(courseware_title)]);
-          print(interpolate('"""}${_("(this post is about %s)") | escapejs}${"""', [courseware_link]));
-      %>"""}</div>
+          print(interpolate('{}', [courseware_link]));
+          """.format(escapejs(_("(this post is about %s)")))
+      %>
+      ${'<% if (obj.courseware_url) { %>'}
+          <div class="post-context">${'<%'}${js_block}${'%>'}</div>
       ${'<% } %>'}
 
       <ul class="moderator-actions">
@@ -120,7 +121,7 @@
 
 <script type="text/template" id="thread-response-show-template">
     <header class="response-local">
-        <a href="#" class="vote-btn" data-tooltip="${_('vote')}" role="button" aria-pressed="false"><!-- DiscussionContentView.renderVote() populates this --></a>
+        <a href="#" class="vote-btn" role="button" aria-pressed="false"><!-- DiscussionContentView.renderVote() populates this --></a>
         <a href="javascript:void(0)" class="endorse-btn action-endorse" style="cursor: default; display: none;" data-tooltip="${_('endorse')}"><span class="check-icon" style="pointer-events: none; "></span></a>
         ${"<% if (obj.username) { %>"}
         <a href="${'<%- user_url %>'}" class="posted-by">${'<%- username %>'}</a>
@@ -157,17 +158,19 @@
     <div class="response-body">${'<%- body %>'}</div>
     <div class="discussion-flag-abuse notflagged" data-role="thread-flag" data-tooltip="${_('Report Misuse')}" role="button" aria-pressed="false" tabindex="0">
       <i class="icon icon-flag"></i><span class="sr flag-label">${_("Report Misuse")}</span></div>
-      <p class="posted-details">${"""<%=
+      <% 
+      js_block = u"""
         interpolate(
-            '"""}${_('-posted %(time_ago)s by') | escapejs}${"""',
-            {'time_ago': '<span class=\"timeago\" title=\"' + created_at + '\">' + created_at + '</span>'},
-            true
-        )
-      %>"""}
+          '{}',
+          {{'time_ago': '<span class=\"timeago\" title=\"' + created_at + '\">' + created_at + '</span>'}},
+          true
+        ) """.format(escapejs(_('-posted %(time_ago)s by'))) %>
+      <p class="posted-details">
+      ${'<%='}${js_block}${'%>'}
       ${"<% if (obj.username) { %>"}
       <a href="${'<%- user_url %>'}" class="profile-link">${'<%- username %>'}</a>
       ${"<% } else { %>"}
-      <span class="anonymous"><em>${_('anonymous')}</em></span>
+      ${_('anonymous')}
       ${"<% } %>"}
     </p>
   </div>
@@ -176,30 +179,39 @@
 <script type="text/template" id="thread-list-item-template">
     <a href="${'<%- id %>'}" data-id="${'<%- id %>'}">
         <span class="title">${"<%- title %>"}</span>
+        <% 
+        js_block =  u"""
+        var fmt; 
+        var data = {{
+            'span_sr_open': '<span class=\"sr\">',
+            'span_close': '</span>',
+            'unread_comments_count': unread_comments_count,
+            'comments_count': comments_count
+            }};
+        if (unread_comments_count > 0) {{
+            fmt = '{}';
+        }} else {{
+            fmt = '{}';
+        }}
+        print(interpolate(fmt, data, true));
+        """.format(
+                escapejs(_('%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s unread comments)%(span_close)s')),
+                escapejs(_('%(comments_count)s %(span_sr_open)scomments%(span_close)s'))
+            )
+        %>
         <span class="comments-count">
-            ${"""<%
-            var fmt; 
-            var data = {
-                'span_sr_open': '<span class=\"sr\">',
-                'span_close': '</span>',
-                'unread_comments_count': unread_comments_count,
-                'comments_count': comments_count
-                };
-            if (unread_comments_count > 0) {
-                fmt = '"""}${_('%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s unread comments)%(span_close)s') | escapejs}${"""';
-            } else {
-                fmt = '"""}${_('%(comments_count)s %(span_sr_open)scomments%(span_close)s') | escapejs}${"""';
-            }
-            print(interpolate(fmt, data, true));
-        %>"""}
+            ${'<%'}${js_block}${'%>'}
         </span>
-        <span class="votes-count">+${"""<%=
+        <% 
+        js_block = u"""
             interpolate(
-                '"""}${_('%(votes_up_count)s%(span_sr_open)svotes%(span_close)s') | escapejs}${"""',
-                {'span_sr_open': '<span class=\"sr\">', 'span_close': '</span>', 'votes_up_count': votes['up_count']},
+                '{}',
+                {{'span_sr_open': '<span class=\"sr\">', 'span_close': '</span>', 'votes_up_count': votes['up_count']}},
                 true
                 )
-         %>"""}</span>
+        """.format(escapejs(_('%(votes_up_count)s%(span_sr_open)svotes%(span_close)s')))
+        %>
+        <span class="votes-count">+${'<%='}${js_block}${'%>'}</span>
     </a>
 </script>
 <script type="text/template" id="discussion-home">
