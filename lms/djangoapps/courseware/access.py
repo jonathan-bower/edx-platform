@@ -245,7 +245,7 @@ def _has_access_descriptor(user, descriptor, action, course_context=None):
             return True
 
         # Check start date
-        if not getattr(descriptor, 'detached') and descriptor.start is not None:
+       if not getattr(descriptor, 'detached', False) and descriptor.start is not None:
             now = datetime.now(UTC())
             effective_start = _adjust_start_date_for_beta_testers(
                 user,
