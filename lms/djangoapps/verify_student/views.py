@@ -360,7 +360,9 @@ class MidCourseReverifyView(View):
         try:
             # TODO make sure we don't need something more specialized, i.e. a subclass on SSPV
 
+            from nose.tools import set_trace; set_trace()
             now = datetime.datetime.now(UTC)
+            attempt = SoftwareSecurePhotoVerification(user=request.user)
             attempt = SSPMidcourseReverification(user=request.user, window=MidcourseReverificationWindow.get_window(course_id, now))
             b64_face_image = request.POST['face_image'].split(",")[1]
 

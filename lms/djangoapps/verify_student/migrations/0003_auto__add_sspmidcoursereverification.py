@@ -11,6 +11,7 @@ class Migration(SchemaMigration):
         # Adding model 'SSPMidcourseReverification'
         db.create_table('verify_student_sspmidcoursereverification', (
             ('softwaresecurephotoverification_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['verify_student.SoftwareSecurePhotoVerification'], unique=True, primary_key=True)),
+            ('window', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['verify_student.MidcourseReverificationWindow'])),
         ))
         db.send_create_signal('verify_student', ['SSPMidcourseReverification'])
 
@@ -74,7 +75,7 @@ class Migration(SchemaMigration):
             'name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
             'photo_id_image_url': ('django.db.models.fields.URLField', [], {'max_length': '255', 'blank': 'True'}),
             'photo_id_key': ('django.db.models.fields.TextField', [], {'max_length': '1024'}),
-            'receipt_id': ('django.db.models.fields.CharField', [], {'default': "'<function uuid4 at 0x217cb90>'", 'max_length': '255', 'db_index': 'True'}),
+            'receipt_id': ('django.db.models.fields.CharField', [], {'default': "'<function uuid4 at 0x1189320>'", 'max_length': '255', 'db_index': 'True'}),
             'reviewing_service': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
             'reviewing_user': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'related_name': "'photo_verifications_reviewed'", 'null': 'True', 'to': "orm['auth.User']"}),
             'status': ('model_utils.fields.StatusField', [], {'default': "'created'", 'max_length': '100', u'no_check_for_status': 'True'}),
@@ -85,7 +86,8 @@ class Migration(SchemaMigration):
         },
         'verify_student.sspmidcoursereverification': {
             'Meta': {'ordering': "['-created_at']", 'object_name': 'SSPMidcourseReverification', '_ormbases': ['verify_student.SoftwareSecurePhotoVerification']},
-            'softwaresecurephotoverification_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['verify_student.SoftwareSecurePhotoVerification']", 'unique': 'True', 'primary_key': 'True'})
+            'softwaresecurephotoverification_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['verify_student.SoftwareSecurePhotoVerification']", 'unique': 'True', 'primary_key': 'True'}),
+            'window': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['verify_student.MidcourseReverificationWindow']"})
         }
     }
 

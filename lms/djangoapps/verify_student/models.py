@@ -741,7 +741,7 @@ class SSPMidcourseReverification(SoftwareSecurePhotoVerification):
 
     # TODO is this necesary
     #course_id = "foobar"
-    #window = models.ForeignKey(MidcourseReverificationWindow, db_index=True)
+    window = models.ForeignKey(MidcourseReverificationWindow, db_index=True)
 
     def original_verification(self):
         return (SoftwareSecurePhotoVerification.objects.get(user=self.user))
