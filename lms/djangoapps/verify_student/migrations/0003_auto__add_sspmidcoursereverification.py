@@ -8,29 +8,16 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'SoftwareSecurePhotoMidcourseReverification'
-        db.create_table('verify_student_softwaresecurephotomidcoursereverification', (
+        # Adding model 'SSPMidcourseReverification'
+        db.create_table('verify_student_sspmidcoursereverification', (
             ('softwaresecurephotoverification_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['verify_student.SoftwareSecurePhotoVerification'], unique=True, primary_key=True)),
-            ('window', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['verify_student.MidcourseReverificationWindow'])),
         ))
-        db.send_create_signal('verify_student', ['SoftwareSecurePhotoMidcourseReverification'])
-
-        # Adding model 'MidcourseReverificationWindow'
-        db.create_table('verify_student_midcoursereverificationwindow', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('course_id', self.gf('django.db.models.fields.CharField')(max_length=255, db_index=True)),
-            ('start_date', self.gf('django.db.models.fields.DateTimeField')(default=None, null=True, blank=True)),
-            ('end_date', self.gf('django.db.models.fields.DateTimeField')(default=None, null=True, blank=True)),
-        ))
-        db.send_create_signal('verify_student', ['MidcourseReverificationWindow'])
+        db.send_create_signal('verify_student', ['SSPMidcourseReverification'])
 
 
     def backwards(self, orm):
-        # Deleting model 'SoftwareSecurePhotoMidcourseReverification'
-        db.delete_table('verify_student_softwaresecurephotomidcoursereverification')
-
-        # Deleting model 'MidcourseReverificationWindow'
-        db.delete_table('verify_student_midcoursereverificationwindow')
+        # Deleting model 'SSPMidcourseReverification'
+        db.delete_table('verify_student_sspmidcoursereverification')
 
 
     models = {
@@ -77,11 +64,6 @@ class Migration(SchemaMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'start_date': ('django.db.models.fields.DateTimeField', [], {'default': 'None', 'null': 'True', 'blank': 'True'})
         },
-        'verify_student.softwaresecurephotomidcoursereverification': {
-            'Meta': {'ordering': "['-created_at']", 'object_name': 'SoftwareSecurePhotoMidcourseReverification', '_ormbases': ['verify_student.SoftwareSecurePhotoVerification']},
-            'softwaresecurephotoverification_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['verify_student.SoftwareSecurePhotoVerification']", 'unique': 'True', 'primary_key': 'True'}),
-            'window': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['verify_student.MidcourseReverificationWindow']"})
-        },
         'verify_student.softwaresecurephotoverification': {
             'Meta': {'ordering': "['-created_at']", 'object_name': 'SoftwareSecurePhotoVerification'},
             'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'db_index': 'True', 'blank': 'True'}),
@@ -92,7 +74,7 @@ class Migration(SchemaMigration):
             'name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
             'photo_id_image_url': ('django.db.models.fields.URLField', [], {'max_length': '255', 'blank': 'True'}),
             'photo_id_key': ('django.db.models.fields.TextField', [], {'max_length': '1024'}),
-            'receipt_id': ('django.db.models.fields.CharField', [], {'default': "'<function uuid4 at 0x186f140>'", 'max_length': '255', 'db_index': 'True'}),
+            'receipt_id': ('django.db.models.fields.CharField', [], {'default': "'<function uuid4 at 0x217cb90>'", 'max_length': '255', 'db_index': 'True'}),
             'reviewing_service': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
             'reviewing_user': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'related_name': "'photo_verifications_reviewed'", 'null': 'True', 'to': "orm['auth.User']"}),
             'status': ('model_utils.fields.StatusField', [], {'default': "'created'", 'max_length': '100', u'no_check_for_status': 'True'}),
@@ -100,6 +82,10 @@ class Migration(SchemaMigration):
             'submitted_at': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'db_index': 'True'}),
             'updated_at': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'db_index': 'True', 'blank': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"})
+        },
+        'verify_student.sspmidcoursereverification': {
+            'Meta': {'ordering': "['-created_at']", 'object_name': 'SSPMidcourseReverification', '_ormbases': ['verify_student.SoftwareSecurePhotoVerification']},
+            'softwaresecurephotoverification_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['verify_student.SoftwareSecurePhotoVerification']", 'unique': 'True', 'primary_key': 'True'})
         }
     }
 

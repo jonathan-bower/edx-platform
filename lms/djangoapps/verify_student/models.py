@@ -737,23 +737,22 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         return response
 
 # lol model validation
-class SoftwareSecurePhotoMidcourseReverification(SoftwareSecurePhotoVerification):
-    """ it's possible i should subclass this from software secure, idk let's see """
+class SSPMidcourseReverification(SoftwareSecurePhotoVerification):
 
     # TODO is this necesary
     #course_id = "foobar"
-    window = models.ForeignKey(MidcourseReverificationWindow, db_index=True)
+    #window = models.ForeignKey(MidcourseReverificationWindow, db_index=True)
 
     def original_verification(self):
         return (SoftwareSecurePhotoVerification.objects.get(user=self.user))
 
     # could just call original_verification's _generate_s3_key?
     def _generate_original_s3_key(self, prefix):
-        """
-        Generates a key into the S3 bucket where the original verification is stored
+        
+        #Generates a key into the S3 bucket where the original verification is stored
 
-        Example: face/4dd1add9-6719-42f7-bea0-115c008c4fca
-        """
+        #Example: face/4dd1add9-6719-42f7-bea0-115c008c4fca
+        
         conn = S3Connection(
             settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["AWS_ACCESS_KEY"],
             settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["AWS_SECRET_KEY"]
@@ -767,11 +766,11 @@ class SoftwareSecurePhotoMidcourseReverification(SoftwareSecurePhotoVerification
 
     @status_before_must_be("created")
     def fetch_photo_id_image(self):
-        """
-        Find the user's photo ID image, which was submitted with their original verification.
-        The image has already been encrypted and stored in s3, so we just need to find that
-        location
-        """
+        
+        #Find the user's photo ID image, which was submitted with their original verification.
+        #The image has already been encrypted and stored in s3, so we just need to find that
+        #location
+        
 
         if settings.FEATURES.get('AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'):
             return
@@ -796,4 +795,5 @@ class SoftwareSecurePhotoMidcourseReverification(SoftwareSecurePhotoVerification
 
     # create_request inherits
 
-    # send_request inherits
+    # send_request inherit
+
