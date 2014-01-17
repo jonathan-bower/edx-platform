@@ -79,7 +79,7 @@ FEATURES = {
     'ENABLE_DISCUSSION_SERVICE': True,
     # discussion home panel, which includes a subscription on/off setting for discussion digest emails.
     # this should remain off in production until digest notifications are online.
-    'ENABLE_DISCUSSION_HOME_PANEL': False,
+    'ENABLE_DISCUSSION_HOME_PANEL': True,
 
     'ENABLE_PSYCHOMETRICS': False,  # real-time psychometrics (eg item response theory analysis in instructor dashboard)
 
@@ -109,10 +109,10 @@ FEATURES = {
     'SHIB_DISABLE_TOS': False,
 
     # Can be turned off if course lists need to be hidden. Effects views and templates.
-    'COURSES_ARE_BROWSABLE': True,
+    'COURSES_ARE_BROWSABLE': False,
 
     # Enables ability to restrict enrollment in specific courses by the user account login method
-    'RESTRICT_ENROLL_BY_REG_METHOD': False,
+    'RESTRICT_ENROLL_BY_REG_METHOD': True,
 
     # analytics experiments
     'ENABLE_INSTRUCTOR_ANALYTICS': False,
@@ -146,7 +146,7 @@ FEATURES = {
     'ENABLE_STUDENT_NOTES': True,
 
     # Provide a UI to allow users to submit feedback from the LMS (left-hand help modal)
-    'ENABLE_FEEDBACK_SUBMISSION': False,
+    'ENABLE_FEEDBACK_SUBMISSION': True,
 
     # Turn on a page that lets staff enter Python code to be run in the
     # sandbox, for testing whether it's enabled properly.
@@ -156,7 +156,7 @@ FEATURES = {
     'ENABLE_SERVICE_STATUS': False,
 
     # Toggle to indicate use of a custom theme
-    'USE_CUSTOM_THEME': False,
+    'USE_CUSTOM_THEME': True,
 
     # Don't autoplay videos for students
     'AUTOPLAY_VIDEOS': False,
@@ -178,7 +178,7 @@ FEATURES = {
 
     # Toggle to enable chat availability (configured on a per-course
     # basis in Studio)
-    'ENABLE_CHAT': False,
+    'ENABLE_CHAT': True,
 
     # Allow users to enroll with methods other than just honor code certificates
     'MULTIPLE_ENROLLMENT_ROLES': False,
