@@ -55,7 +55,7 @@ class Command(NoArgsCommand):
         # TODO: do this with the django-settings-context-processor
         return {
             "FEATURES": settings.FEATURES,
-            "THEME_NAME" : 'zipfian' #getattr(settings, "THEME_NAME", None),
+            "THEME_NAME" : 'zipfian', #getattr(settings, "THEME_NAME", None),
         }
 
 
