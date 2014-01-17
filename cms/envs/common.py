@@ -41,7 +41,7 @@ FEATURES = {
 
     'GITHUB_PUSH': False,
 
-    'ENABLE_DISCUSSION_SERVICE': False,
+    'ENABLE_DISCUSSION_SERVICE': True,
 
     'AUTH_USE_MIT_CERTIFICATES': False,
 
@@ -63,9 +63,11 @@ FEATURES = {
     # edX has explicitly added them to the course creator group.
     'ENABLE_CREATOR_GROUP': False,
 
+    'DISABLE_COURSE_CREATION': True,
+
     # If set to True, Studio won't restrict the set of advanced components
     # to just those pre-approved by edX
-    'ALLOW_ALL_ADVANCED_COMPONENTS': False,
+    'ALLOW_ALL_ADVANCED_COMPONENTS': True,
 }
 ENABLE_JASMINE = False
 

@@ -16,7 +16,7 @@ urlpatterns = ('',  # nopep8
     url(r'^$', 'branding.views.index', name="root"),   # Main marketing page, or redirect to courseware
     url(r'^dashboard$', 'student.views.dashboard', name="dashboard"),
     url(r'^login$', 'student.views.signin_user', name="signin_user"),
-    url(r'^register$', 'student.views.register_user', name="register_user"),
+    # url(r'^register$', 'student.views.register_user', name="register_user"),
 
     url(r'^admin_dashboard$', 'dashboard.views.dashboard'),
 
@@ -38,7 +38,7 @@ urlpatterns = ('',  # nopep8
     url(r'^login_ajax$', 'student.views.login_user', name="login"),
     url(r'^login_ajax/(?P<error>[^/]*)$', 'student.views.login_user'),
     url(r'^logout$', 'student.views.logout_user', name='logout'),
-    url(r'^create_account$', 'student.views.create_account', name='create_account'),
+    # url(r'^create_account$', 'student.views.create_account', name='create_account'),
     url(r'^activate/(?P<key>[^/]*)$', 'student.views.activate_account', name="activate"),
 
     url(r'^password_reset/$', 'student.views.password_reset', name='password_reset'),

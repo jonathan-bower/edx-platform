@@ -42,7 +42,7 @@ urlpatterns = patterns('',  # nopep8
 urlpatterns += patterns(
     '',
 
-    url(r'^create_account$', 'student.views.create_account'),
+    # url(r'^create_account$', 'student.views.create_account'),
     url(r'^activate/(?P<key>[^/]*)$', 'student.views.activate_account', name='activate'),
 
     # ajax view that actually does the work
@@ -56,7 +56,7 @@ urlpatterns += patterns(
 
     url(r'^$', 'howitworks', name='homepage'),
     url(r'^howitworks$', 'howitworks'),
-    url(r'^signup$', 'signup', name='signup'),
+    # url(r'^signup$', 'signup', name='signup'),
     url(r'^signin$', 'login_page', name='login'),
     url(r'^request_course_creator$', 'request_course_creator'),
 
