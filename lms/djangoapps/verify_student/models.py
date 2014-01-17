@@ -738,10 +738,26 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
 
 # lol model validation
 class SSPMidcourseReverification(SoftwareSecurePhotoVerification):
-
     # TODO is this necesary
     #course_id = "foobar"
     window = models.ForeignKey(MidcourseReverificationWindow, db_index=True)
+
+    @classmethod
+    def user_is_reverified_for_all(self, course_id, user):
+        all_windows = MidcourseReverificationWindow.objects.filter(course_id=course_id)
+        # TODO check on this
+        # if there are no windows for a course, then return True right off
+        if (not all_windows):
+            return True
+        for window in all_windows:
+            try:
+                # There should be one and only one reverification object per (user, window)
+                # and the status of that object should be approved
+                if cls.objects.get(window=window, user=user).status != "approved":
+                    return False
+            except:
+                return False
+        return True
 
     def original_verification(self):
         return (SoftwareSecurePhotoVerification.objects.get(user=self.user))
