@@ -8,7 +8,7 @@ from lettuce import world, step
 from lettuce.django import django_url
 from common import course_id, visit_scenario_item
 
-from courseware.tests.factories import InstructorFactory
+from courseware.tests.factories import InstructorFactory, BetaTesterFactory
 
 
 @step('I view the LTI and error is shown$')
@@ -65,8 +65,8 @@ def incorrect_lti_is_rendered(_step):
     check_lti_iframe_content("Wrong LTI signature")
 
 
-@step('the course has correct LTI credentials$')
-def set_correct_lti_passport(_step):
+@step('the course has correct LTI credentials with registered (.*)$')
+def set_correct_lti_passport(_step, user='Instructor'):
     coursenum = 'test_course'
     metadata = {
         'lti_passports': ["correct_lti_id:{}:{}".format(
@@ -74,7 +74,7 @@ def set_correct_lti_passport(_step):
             world.lti_server.oauth_settings['client_secret']
         )]
     }
-    i_am_registered_for_the_course(coursenum, metadata)
+    i_am_registered_for_the_course(coursenum, metadata, user)
 
 
 @step('the course has incorrect LTI credentials$')
@@ -181,16 +181,18 @@ def create_course(course, metadata):
         metadata={'graded': True, 'format': 'Homework'})
 
 
-def i_am_registered_for_the_course(course, metadata):
+def i_am_registered_for_the_course(course, metadata, user='Instructor'):
     # Create the course
     create_course(course, metadata)
 
-    # Create an instructor
-    instructor = InstructorFactory(course=world.scenario_dict['COURSE'].location)
+    factory_class = user + 'Factory'
+
+    # Create user
+    user = factory_class(course=world.scenario_dict['COURSE'].location)
 
     # Enroll the user in the course and log them in
-    world.enroll_user(instructor, course_id(course))
-    world.log_in(username=instructor.username, password='test')
+    world.enroll_user(user, course_id(course))
+    world.log_in(username=user.username, password='test')
 
 
 def check_lti_popup():
