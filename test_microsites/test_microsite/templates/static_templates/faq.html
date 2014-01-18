@@ -102,10 +102,6 @@
           <p>${_("{EdX} institutions have assembled faculty members who will collect and analyze data to assess results and the impact {edX} is having on learning.").format(EdX="EdX", edX="edX")}</p>
         </article>
         <article class="response">
-          <h3>${_("How may I apply to study with {edX}?").format(edX="edX")}</h3>
-          <p>${_('Simply complete the online {link_start}signup form{link_end}.  Enrolling will create your unique student record in the {edX} database, allow you to register for classes, and to receive a certificate on successful completion.').format(link_start='<a href="#signup-modal" rel="leanModal">', link_end='</a>', edX="edX")}</p>
-        </article>
-        <article class="response">
           <h3>${_("How may another university participate in {edX}? ").format(edX="edX")}</h3>
           <p>${_('If you are from a university interested in discussing {edX}, please email {email}').format(email='<a href="mailto:university@edx.org">university@edx.org</a>', edX="edX")}</p>
         </article>
@@ -133,7 +129,3 @@
     </nav>
   </section>
 </section>
-
-%if user.is_authenticated():
-<%include file="../signup_modal.html" />
-%endif

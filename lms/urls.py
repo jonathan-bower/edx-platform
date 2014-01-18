@@ -58,7 +58,7 @@ urlpatterns = ('',  # nopep8
 
     url(r'^heartbeat$', include('heartbeat.urls')),
 
-    url(r'^user_api/', include('user_api.urls')),
+    # url(r'^user_api/', include('user_api.urls')),
 
     url(r'^', include('waffle.urls')),
 )
